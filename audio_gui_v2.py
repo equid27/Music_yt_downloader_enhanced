@@ -364,15 +364,15 @@ class AudioGUIV2:
                     
                     self.root.after(0, lambda: self.update_status("✅ Descarga completada", "green"))
                     
-                                 except yt_dlp.utils.DownloadError as e:
-                     error_msg = str(e)
-                     if "only images are available" in error_msg.lower():
-                         self.log_message("❌ Error: Este contenido no tiene audio")
-                         self.log_message("💡 Intenta con un video que tenga audio")
-                     else:
-                         self.log_message(f"❌ Error de descarga: {error_msg}")
-                     
-                     self.root.after(0, lambda: self.update_status("❌ Error en descarga", "red"))
+                except yt_dlp.utils.DownloadError as e:
+                    error_msg = str(e)
+                    if "only images are available" in error_msg.lower():
+                        self.log_message("❌ Error: Este contenido no tiene audio")
+                        self.log_message("💡 Intenta con un video que tenga audio")
+                    else:
+                        self.log_message(f"❌ Error de descarga: {error_msg}")
+                    
+                    self.root.after(0, lambda: self.update_status("❌ Error en descarga", "red"))
                 
         except Exception as e:
             self.log_message(f"❌ Error inesperado: {str(e)}")
