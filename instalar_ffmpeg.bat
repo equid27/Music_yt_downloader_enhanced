@@ -4,13 +4,33 @@ echo  Instalando FFmpeg para maxima calidad
 echo ========================================
 echo.
 
-echo Descargando FFmpeg...
+REM Verificar si FFmpeg ya existe
+if exist "ffmpeg.exe" if exist "ffprobe.exe" (
+    echo ✅ FFmpeg ya esta instalado
+    goto :fin
+)
+
+echo 📥 Descargando FFmpeg...
+echo.
+echo Intentando descargar desde GitHub...
 curl -L -o ffmpeg.zip "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
 
 if errorlevel 1 (
-    echo ERROR: No se pudo descargar FFmpeg
-    echo Intentando metodo alternativo...
-    powershell -Command "& {Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'}"
+    echo ❌ ERROR: No se pudo descargar desde GitHub
+    echo 📥 Intentando método alternativo...
+    powershell -Command "& {try { Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip' -ErrorAction Stop; Write-Host '✅ Descarga completada' } catch { Write-Host '❌ Error en descarga alternativa'; exit 1 }}"
+    
+    if errorlevel 1 (
+        echo ❌ ERROR: Falló la descarga desde ambas fuentes
+        echo.
+        echo 💡 Soluciones posibles:
+        echo   1. Verificar conexión a Internet
+        echo   2. Descargar manualmente desde: https://ffmpeg.org/download.html
+        echo   3. Colocar ffmpeg.exe y ffprobe.exe en esta carpeta
+        echo.
+        pause
+        exit /b 1
+    )
 )
 
 echo.
@@ -32,15 +52,32 @@ if exist "ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe" (
 )
 
 echo.
-echo Limpiando archivos temporales...
-del "ffmpeg.zip"
+echo 🧹 Limpiando archivos temporales...
+if exist "ffmpeg.zip" del "ffmpeg.zip"
 
-echo.
-echo ========================================
-echo  FFmpeg instalado correctamente!
-echo ========================================
-echo.
+REM Verificar que la instalación fue exitosa
+if exist "ffmpeg.exe" if exist "ffprobe.exe" (
+    echo.
+    echo ========================================
+    echo  ✅ FFmpeg instalado correctamente!
+    echo ========================================
+    echo.
+    echo Archivos instalados:
+    echo   - ffmpeg.exe
+    echo   - ffprobe.exe
+    echo.
+) else (
+    echo.
+    echo ❌ ERROR: La instalación no se completó correctamente
+    echo.
+    echo Verifica que los archivos ffmpeg.exe y ffprobe.exe estén presentes.
+    pause
+    exit /b 1
+)
+
+:fin
 echo Ahora puedes usar el descargador con maxima calidad:
-echo   python youtube_music_downloader.py --interactive
+echo   🎨 GUI: gui_v2.bat
+echo   💻 CLI: audio_v2.bat
 echo.
 pause 
